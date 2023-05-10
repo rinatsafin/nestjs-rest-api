@@ -16,6 +16,13 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@/*": ["src/*"],
+      "@/entity": ["src/entity/*", "src/entity/index.ts"],
+      "@/features": ["src/features/*", "src/features/index.ts"],
+      "@/shared": ["src/shared/*", "src/shared/index.ts"],
+      "@/store": ["src/store/*", "src/store/index.ts"]
+    }
   }
 }

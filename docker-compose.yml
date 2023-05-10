@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  dev-db:
+    image: postgres:15.2
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: ecW^4v3K793*4^
+      POSTGRES_DB: bookmarks_db
+    networks:
+      - freecodecamp
+networks:
+  freecodecamp:
