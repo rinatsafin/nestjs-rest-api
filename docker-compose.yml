@@ -10,5 +10,15 @@ services:
       POSTGRES_DB: bookmarks_db
     networks:
       - freecodecamp
+  test-db:
+    image: postgres:15.2
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: ecW^4v3K793*4^
+      POSTGRES_DB: test_bookmarks_db
+    networks:
+      - freecodecamp
 networks:
   freecodecamp:
