@@ -1,4 +1,4 @@
 export * from './user';
 export * from './auth';
-export * from './bookmarks';
+export * from './bookmark';
 export * from './prisma';

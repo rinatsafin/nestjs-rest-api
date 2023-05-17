@@ -15,6 +15,6 @@ export class UserController {
 
   @Patch('edit-user')
   editUser(@GetUserDecorator() user: User) {
-    return user;
+    console.log(user);
   }
 }
