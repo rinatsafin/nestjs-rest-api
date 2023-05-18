@@ -5,6 +5,7 @@ import * as pactum from 'pactum'; // library to test HTTP requests
 import { AppModule } from '@/app.module';
 import { PrismaService } from '@/entity/prisma/prisma.service';
 import { AuthDto } from '@/entity/auth/dto';
+import { CreateBookmarkDto, EditBookmarkDto } from '@/entity/bookmark/dto';
 
 describe('App e2e init test', () => {
   let app: INestApplication;
@@ -110,8 +111,7 @@ describe('App e2e init test', () => {
             password: userAuthDto.password,
           })
           .expectStatus(HttpStatus.OK)
-          .stores('userAccessToken', 'access_token')
-          .inspect();
+          .stores('userAccessToken', 'access_token');
         // Note: You can use .inspect() to see the response body
       });
     });
@@ -134,41 +134,120 @@ describe('App e2e init test', () => {
       });
     });
 
-    // describe('Edit user', () => {
-    //   const userEditDto = {
-    //     email: 'useremail2@mail.test.com',
-    //     firstName: 'userfirstname2',
-    //     lastName: 'userlastname2',
-    //   };
-    //   it('user profile should be edited', () => {
-    //     return pactum
-    //       .spec()
-    //       .put('/users/edit-user')
-    //       .withJson(userEditDto)
-    //       .expectBodyContains(userEditDto.email);
-    //   });
-    // });
+    describe('Edit user', () => {
+      const userEditDto = {
+        email: 'useremail2@mail.test.com',
+        firstName: 'userfirstname2',
+        lastName: 'userlastname2',
+      };
+
+      it('should be edited', () => {
+        return pactum
+          .spec()
+          .patch('/users/edit-user')
+          .withBearerToken('$S{userAccessToken}')
+          .withJson(userEditDto)
+          .expectStatus(HttpStatus.OK)
+          .expectBodyContains(userEditDto.email)
+          .expectBodyContains(userEditDto.firstName)
+          .expectBodyContains(userEditDto.lastName);
+      });
+    });
   });
 
   describe('Bookmark', () => {
+    const createBookmarkDto: CreateBookmarkDto = {
+      title: 'First bookmark',
+      url: 'https://www.youtube.com/watch?v=GHTA143_b-s',
+      description: 'NestJs Course for Beginners - Create a REST API',
+    };
+    const editBookmarkDto: EditBookmarkDto = {
+      title: 'Kubernetes Course - Full Beginners Tutorial',
+      url: 'https://www.youtube.com/watch?v=d6WC5n9G_sM',
+      description:
+        'Learn how to use Kubernetes in this complete course. Kubernetes makes it possible to containerize applications and simplifies app deployment to production.',
+    };
+    describe('Get empty bookmarks', () => {
+      it('should be empty list of bookmarks', () => {
+        return pactum
+          .spec()
+          .get('/bookmarks')
+          .withBearerToken('$S{userAccessToken}')
+          .expectStatus(HttpStatus.OK)
+          .expectBody([]);
+      });
+    });
+
     describe('Create bookmark', () => {
-      it.todo('should be create bookmark');
+      it('should be create bookmark', () => {
+        return pactum
+          .spec()
+          .post('/bookmarks/create-bookmark')
+          .withBearerToken('$S{userAccessToken}')
+          .withBody(createBookmarkDto)
+          .expectStatus(HttpStatus.CREATED)
+          .stores('bookmarkId', 'id');
+      });
     });
 
     describe('Get bookmarks', () => {
-      it.todo('should be edit bookmark');
+      it('should be list of bookmarks', () => {
+        return pactum
+          .spec()
+          .get('/bookmarks')
+          .withBearerToken('$S{userAccessToken}')
+          .expectStatus(HttpStatus.OK)
+          .expectJsonLength(1);
+      });
     });
 
     describe('Get bookmark by id', () => {
-      it.todo('should be edit bookmark');
+      it('should be get bookmark', () => {
+        return pactum
+          .spec()
+          .get('/bookmarks/{id}')
+          .withPathParams('id', '$S{bookmarkId}')
+          .withBearerToken('$S{userAccessToken}')
+          .expectStatus(HttpStatus.OK)
+          .expectBodyContains(createBookmarkDto.title)
+          .expectBodyContains('$S{bookmarkId}');
+      });
     });
 
     describe('Edit bookmark by id', () => {
-      it.todo('should be edit bookmark');
+      it('should be edited', () => {
+        return pactum
+          .spec()
+          .patch('/bookmarks/{id}')
+          .withPathParams('id', '$S{bookmarkId}')
+          .withBearerToken('$S{userAccessToken}')
+          .withJson(editBookmarkDto)
+          .expectStatus(HttpStatus.OK)
+          .expectBodyContains(editBookmarkDto.title)
+          .expectBodyContains('$S{bookmarkId}')
+          .expectBodyContains(editBookmarkDto.url)
+          .expectBodyContains(editBookmarkDto.description);
+      });
     });
 
     describe('Delete bookmark by id', () => {
-      it.todo('should be delete bookmark');
+      it('should be deleted', () => {
+        return pactum
+          .spec()
+          .delete('/bookmarks/{id}')
+          .withPathParams('id', '$S{bookmarkId}')
+          .withBearerToken('$S{userAccessToken}')
+          .expectStatus(HttpStatus.NO_CONTENT);
+      });
+
+      it('should be empty list of bookmarks', () => {
+        return pactum
+          .spec()
+          .get('/bookmarks')
+          .withBearerToken('$S{userAccessToken}')
+          .expectStatus(HttpStatus.OK)
+          .expectJsonLength(0);
+      });
     });
   });
 
